@@ -58,7 +58,7 @@ async def randomize(message: types.Message):
                                  f'Жанры: {anime_data["category"]}\n'
                                  f'Тип: {anime_data["type"]}\n'
                                  f'\n'
-                                 f'<a href="{await create_page(anime_data["name"], anime_data["description"])}">Нажмите, чтобы прочесть описание</a>',
+                                 f'<a href="{await create_page(anime_data["name"], "https://www.youtube.com")}">Нажмите, чтобы прочесть описание</a>',
                                  reply_markup=keyboard_markup,
                                  parse_mode=types.ParseMode.HTML)
         except Exception as ex:
