@@ -29,7 +29,7 @@ import os
 from yummy_pages import create_page
 
 
-bot = Bot(token=os.getenv("TOKEN"))
+bot = Bot(token="5283101641:AAFHLqoynQNswFdIFFbHcE-Sct_uWhAYEIU")
 dp = Dispatcher(bot)
 
 button_random = KeyboardButton("🎲 Случайное аниме 🎲")
