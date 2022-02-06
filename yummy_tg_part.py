@@ -57,6 +57,7 @@ async def get_message():
     json_str = request.get_json().decode('utf-8')
     update = types.Update.as_json(json_str)
     await bot.get_updates(allowed_updates=[update])
+    return '!', 200
 
 
 @server.route('/')
