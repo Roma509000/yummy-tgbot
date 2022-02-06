@@ -1,8 +1,9 @@
 from telegraph.aio import Telegraph
+import os
 
 
 async def create_page(name, description):
-    telegraph = Telegraph(access_token='556e3c7105b489aa646515a5b8d6eabd32641a2447b933e36d7a9f0198ac')
+    telegraph = Telegraph(access_token=os.getenv('TOKEN_2'))
     account = await telegraph.get_account_info()
 
     page = await telegraph.create_page(
@@ -17,6 +18,5 @@ async def create_page(name, description):
         author_url=account['author_url']
     )
 
-    print(page['url'])
     return page['url']
 
