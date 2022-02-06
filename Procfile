@@ -1,1 +1,1 @@
-web: python yummy_tg_part.py
+worker: python yummy_tg_part.py
