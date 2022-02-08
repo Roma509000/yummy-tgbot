@@ -9,6 +9,13 @@ bot = Bot(token=os.getenv('TOKEN_1'))
 dp = Dispatcher(bot)
 
 
+async def on_startup(dp):
+    await bot.set_webhook(os.getenv('APP_URL'))
+
+async def on_shutdown(dp):
+    await bot.delete_webhook()
+
+
 random_button = KeyboardButton("🎲 Случайное аниме 🎲")
 keyboard_menu = ReplyKeyboardMarkup(resize_keyboard=True).add(random_button)
 
@@ -17,15 +24,33 @@ keyboard_menu = ReplyKeyboardMarkup(resize_keyboard=True).add(random_button)
 async def command_start(message: types.Message):
     await bot.send_message(
                             message.from_user.id,
-                            'Нажмите на кнопку "Случайное аниме", чтобы получить случайную рекомендацию',
+                            f'Нажмите на кнопку "Случайное аниме", чтобы получить случайную рекомендацию.\n'
+                            f'\n'
+                            f'Команда /start_from_rate_9 предназначена для поиска рекомендаций с рейтингом выше 9',
                             reply_markup=keyboard_menu
     )
 
+
+random_button_with_higher_rate = KeyboardButton("🔥 Случайное аниме 🔥")
+keyboard_menu_with_higher_rate = ReplyKeyboardMarkup(resize_keyboard=True).add(random_button_with_higher_rate)
+
+
+@dp.message_handler(commands=['start_from_rate_9'])
+async def command_start(message: types.Message):
+    await bot.send_message(
+                            message.from_user.id,
+                            f'Нажмите на кнопку "Случайное аниме", чтобы получить случайную рекомендацию с рейтингом выше 9\n'
+                            f'\n'
+                            f'Вернуться к базовому поиску - /start',
+                            reply_markup=keyboard_menu_with_higher_rate
+    )
+
+
 @dp.message_handler()
 async def process_message(message: types.Message):
-    if message.text == '🎲 Случайное аниме 🎲':
+    if message.text == '🎲 Случайное аниме 🎲' or message.text == '🔥 Случайное аниме 🔥':
         try:
-            anime_data = get_random()
+            anime_data = get_random(higher_rate=message.text == '🔥 Случайное аниме 🔥')
             url_button = types.InlineKeyboardButton('Смотреть на YummyAnime', url=anime_data['url'])
             keyboard_markup = types.InlineKeyboardMarkup().add(url_button)
 
@@ -57,7 +82,15 @@ async def process_message(message: types.Message):
             print(ex)
             await bot.send_message(message.from_user.id, 'Произошла ошибка. Попытайтесь ещё раз!')
     else:
-        await message.reply('Обратитесь к команде /start, чтобы получить случайную рекомендацию')
+        await message.reply('Обратитесь к команде /start или /start_from_rate_9, чтобы получить случайную рекомендацию')
 
 
-executor.start_polling(dp, skip_updates=True)
+executor.start_webhook(
+                    dispatcher=dp,
+                    webhook_path='',
+                    on_startup=on_startup,
+                    on_shutdown=on_shutdown,
+                    skip_updates=True,
+                    host="0.0.0.0",
+                    port=int(os.getenv("PORT", 5000))
+)
